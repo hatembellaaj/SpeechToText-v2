@@ -32,6 +32,7 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-stt_user}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-stt_db}
       REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app
     volumes:
       - uploads:/app/uploads
       - whisper_models:/app/models
@@ -46,11 +47,12 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     restart: unless-stopped
-    command: celery -A app.worker.celery_app worker --loglevel=info --concurrency=2
+    command: sh -c "cd /app && PYTHONPATH=/app celery -A app.worker.celery_app worker --loglevel=info --concurrency=2"
     env_file: .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-stt_user}:${POSTGRES_PASSWORD:-changeme}@postgres:5432/${POSTGRES_DB:-stt_db}
       REDIS_URL: redis://redis:6379/0
+      PYTHONPATH: /app
     volumes:
       - uploads:/app/uploads
       - whisper_models:/app/models
