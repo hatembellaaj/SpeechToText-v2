@@ -21,7 +21,7 @@ frontend/.cache/
 # Docker volumes (ne jamais versionner les données)
 postgres_data/
 uploads/
-models/
+/models/
 
 # OS
 .DS_Store
