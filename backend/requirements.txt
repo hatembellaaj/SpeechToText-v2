@@ -19,6 +19,7 @@ faster-whisper>=1.1.0
 pyannote.audio==3.3.2
 torch==2.2.2
 torchaudio==2.2.2
+huggingface_hub<0.26.0
 
 # Config
 pydantic-settings==2.2.1
