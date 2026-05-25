@@ -1,4 +1,5 @@
 import uuid
+import json
 from datetime import datetime
 
 from celery import Task
@@ -41,6 +42,7 @@ def transcribe_audio(self, transcription_id: str, audio_path: str):
         # Mettre à jour avec les résultats
         t.status = TranscriptionStatus.completed
         t.text = result["text"]
+        t.segments = json.dumps(result.get("segments") or [], ensure_ascii=False)
         t.language_detected = result["language_detected"]
         t.duration_seconds = result["duration_seconds"]
         t.processing_time_seconds = result["processing_time_seconds"]

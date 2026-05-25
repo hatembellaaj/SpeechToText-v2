@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     whisper_device: str = "cpu"
     whisper_compute_type: str = "int8"
 
+    # HuggingFace (diarisation)
+    hf_token: str = ""
+
     # CORS
     allowed_origins: str = "http://localhost,http://localhost:80,http://localhost:3000"
 

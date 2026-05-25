@@ -33,6 +33,7 @@ class Transcription(Base):
 
     # Résultats
     text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    segments: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON
     language_detected: Mapped[str | None] = mapped_column(String(10), nullable=True)
     duration_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
     processing_time_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)

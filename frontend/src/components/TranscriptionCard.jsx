@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Copy, Download, Trash2, ChevronDown, ChevronUp, Clock, FileAudio } from "lucide-react";
+import { Copy, Download, Trash2, ChevronDown, ChevronUp, Clock, FileAudio, Users } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import { api } from "../api/client";
 
@@ -22,11 +22,68 @@ function formatBytes(bytes) {
   return (bytes / 1024 / 1024).toFixed(1) + " MB";
 }
 
+const SPEAKER_COLORS = [
+  "bg-sky-100 text-sky-800 border-sky-200",
+  "bg-violet-100 text-violet-800 border-violet-200",
+  "bg-emerald-100 text-emerald-800 border-emerald-200",
+  "bg-amber-100 text-amber-800 border-amber-200",
+  "bg-rose-100 text-rose-800 border-rose-200",
+];
+
+function DiarizedView({ segments }) {
+  // Construire la map speaker → label + couleur
+  const speakerMap = {};
+  let counter = 1;
+  for (const seg of segments) {
+    if (seg.speaker && !speakerMap[seg.speaker]) {
+      speakerMap[seg.speaker] = {
+        label: `Intervenant ${counter++}`,
+        color: SPEAKER_COLORS[(Object.keys(speakerMap).length) % SPEAKER_COLORS.length],
+      };
+    }
+  }
+
+  // Regrouper les segments consécutifs du même interlocuteur
+  const groups = [];
+  for (const seg of segments) {
+    const info = speakerMap[seg.speaker] || { label: "?", color: SPEAKER_COLORS[0] };
+    if (groups.length > 0 && groups[groups.length - 1].label === info.label) {
+      groups[groups.length - 1].texts.push(seg.text);
+    } else {
+      groups.push({ label: info.label, color: info.color, texts: [seg.text] });
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      {Object.keys(speakerMap).length > 1 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <Users className="w-3.5 h-3.5 text-gray-400" />
+          {Object.values(speakerMap).map((s) => (
+            <span key={s.label} className={`text-xs px-2 py-0.5 rounded-full border font-medium ${s.color}`}>
+              {s.label}
+            </span>
+          ))}
+        </div>
+      )}
+      {groups.map((g, i) => (
+        <div key={i} className="flex gap-3">
+          <span className={`text-xs px-2 py-1 rounded-full border font-medium shrink-0 h-fit mt-0.5 ${g.color}`}>
+            {g.label}
+          </span>
+          <p className="text-sm text-gray-700 leading-relaxed">{g.texts.join(" ")}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function TranscriptionCard({ transcription, onDelete }) {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
-  const { id, original_filename, status, text, duration_seconds,
+  const { id, original_filename, status, text, segments, duration_seconds,
           processing_time_seconds, created_at, file_size_bytes } = transcription;
+  const hasDiarization = segments && segments.length > 0;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(text || "");
@@ -62,11 +119,14 @@ export default function TranscriptionCard({ transcription, onDelete }) {
         <StatusBadge status={status} />
       </div>
 
-      {/* Texte */}
+      {/* Texte / Diarisation */}
       {status === "completed" && text && (
         <>
-          <div className={`px-4 pb-2 overflow-hidden transition-all ${expanded ? "" : "max-h-24"}`}>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{text}</p>
+          <div className={`px-4 pb-2 overflow-hidden transition-all ${expanded ? "" : "max-h-32"}`}>
+            {hasDiarization
+              ? <DiarizedView segments={segments} />
+              : <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{text}</p>
+            }
           </div>
 
           {/* Actions */}
