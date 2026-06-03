@@ -38,6 +38,10 @@ def transcribe_file(audio_path: str) -> dict:
         word_timestamps=False,
         vad_filter=True,
         vad_parameters=dict(min_silence_duration_ms=500),
+        no_speech_threshold=0.6,
+        log_prob_threshold=-1.0,
+        compression_ratio_threshold=2.4,
+        condition_on_previous_text=False,
     )
     whisper_segments = list(raw_segments)
 
