@@ -42,17 +42,18 @@ class AnalysisResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-def _run_analysis(analysis_id: uuid.UUID, db: Session):
-    """Exécute l'analyse LLM en arrière-plan."""
+def _run_analysis(analysis_id: uuid.UUID, _db_ignored: Session):
+    """Exécute l'analyse LLM en arrière-plan avec sa propre session DB."""
     from app.services.analysis import run_full_analysis
+    from app.database import SessionLocal
 
-    analysis = db.query(TranscriptionAnalysis).filter(
-        TranscriptionAnalysis.id == analysis_id
-    ).first()
-    if not analysis:
-        return
+    db = SessionLocal()
+        analysis = db.query(TranscriptionAnalysis).filter(
+            TranscriptionAnalysis.id == analysis_id
+        ).first()
+        if not analysis:
+            return
 
-    try:
         analysis.status = "processing"
         analysis.updated_at = datetime.utcnow()
         db.commit()
@@ -74,6 +75,9 @@ def _run_analysis(analysis_id: uuid.UUID, db: Session):
             for p in profiles
         ]
 
+        if not profiles_data:
+            raise ValueError(f"Aucun profil défini pour ce projet. Ajoutez des profils depuis la page Projets.")
+
         # Lancer l'analyse
         result = run_full_analysis(transcription.text, profiles_data)
 
@@ -92,14 +96,23 @@ def _run_analysis(analysis_id: uuid.UUID, db: Session):
         analysis.updated_at = datetime.utcnow()
         db.commit()
 
-        print(f"[Analysis] ✓ Analyse {analysis_id} terminée")
+        print(f"[Analysis] ✓ Analyse {analysis_id} terminée — profil={result.get('profile_id')}")
 
     except Exception as exc:
-        analysis.status = "failed"
-        analysis.error_message = str(exc)
-        analysis.updated_at = datetime.utcnow()
-        db.commit()
+        try:
+            analysis = db.query(TranscriptionAnalysis).filter(
+                TranscriptionAnalysis.id == analysis_id
+            ).first()
+            if analysis:
+                analysis.status = "failed"
+                analysis.error_message = str(exc)
+                analysis.updated_at = datetime.utcnow()
+                db.commit()
+        except Exception:
+            pass
         print(f"[Analysis] ✗ Erreur analyse {analysis_id}: {exc}")
+    finally:
+        db.close()
 
 
 @router.post("", response_model=AnalysisResponse, status_code=202)
