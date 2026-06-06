@@ -7,13 +7,48 @@ const PROFILE_COLORS = [
 ];
 
 const THERMOR_PROFILES = [
-  { name: "Conquête", description: "Client potentiel intéressé par les produits, en phase de découverte ou d'achat. Montre un intérêt actif, pose des questions sur les caractéristiques, les prix, les délais.", color: "#10B981", order: 1 },
-  { name: "Fidèle", description: "Client existant satisfait qui renouvelle son équipement ou recommande la marque. Exprime une satisfaction, cite des expériences positives passées.", color: "#3B82F6", order: 2 },
-  { name: "Ambassadeur", description: "Client très satisfait qui recommande activement la marque à son entourage. Parle de recommandation, de partage d'expérience positive.", color: "#8B5CF6", order: 3 },
-  { name: "À risque", description: "Client existant qui montre des signes d'insatisfaction mais reste encore client. Évoque des problèmes, des déceptions, compare avec la concurrence.", color: "#F59E0B", order: 4 },
-  { name: "Churn", description: "Client qui a ou envisage de quitter la marque. Exprime une insatisfaction forte, parle de retour produit, de résiliation ou de passage à un concurrent.", color: "#EF4444", order: 5 },
-  { name: "SAV / Réclamation", description: "Client contactant le service après-vente pour une panne, un défaut ou une réclamation. Le propos tourne autour d'un problème technique ou d'une demande de réparation/remplacement.", color: "#EC4899", order: 6 },
-  { name: "Non catégorisé", description: "Le comportement du client ne correspond clairement à aucun des 6 profils définis. Conversation trop courte, hors-sujet ou neutre.", color: "#9CA3AF", order: 7, is_neutral: true },
+  {
+    name: "Conquête",
+    description: "Non-client Thermor effectuant son premier achat (toutes familles). L'installateur n'a jamais travaillé avec Thermor ou découvre la marque pour la première fois. Il pose des questions de base sur les produits, les prix, les démarches pour référencer Thermor.",
+    keywords: "premier achat, nouveau client, référencement, découverte, jamais commandé",
+    color: "#10B981", order: 1, is_neutral: false,
+  },
+  {
+    name: "Change",
+    description: "Client Thermor existant sur certaines familles, qui démarre sur une nouvelle famille de produits. Il a une relation avec Thermor mais aborde une technicité nouvelle (ex. client radiateurs qui installe sa première PAC Thermor).",
+    keywords: "nouvelle famille, première installation, formation, montée en gamme",
+    color: "#3B82F6", order: 2, is_neutral: false,
+  },
+  {
+    name: "Cross sell",
+    description: "Installateur actif sur une famille de produits mais chez un concurrent, qui démarre cette famille avec Thermor. Il maîtrise la technicité mais veut changer de marque, souvent après des problèmes SAV chez la concurrence.",
+    keywords: "changement de marque, concurrent, SAV concurrent, tester Thermor, migration",
+    color: "#8B5CF6", order: 3, is_neutral: false,
+  },
+  {
+    name: "Hausse d'usage",
+    description: "Client Thermor existant dont la part d'achats Thermor augmente sur une ou plusieurs familles. Il est satisfait, accroît sa fidélité, réduit sa part concurrente. Peut négocier de meilleures conditions commerciales.",
+    keywords: "augmentation volume, fidélisation, satisfaction, conditions commerciales",
+    color: "#F59E0B", order: 4, is_neutral: false,
+  },
+  {
+    name: "Baisse d'usage",
+    description: "Client Thermor existant dont la part d'achats diminue sur une ou plusieurs familles. Il s'oriente vers des concurrents, souvent pour des raisons de prix ou d'insatisfaction partielle. Reste encore client mais montre des signaux de désengagement.",
+    keywords: "réduction volume, concurrent moins cher, remise, insatisfaction partielle",
+    color: "#EF4444", order: 5, is_neutral: false,
+  },
+  {
+    name: "Churn",
+    description: "Client qui a arrêté ou envisage d'arrêter complètement Thermor sur une famille ou toutes les familles. Insatisfaction forte, souvent liée à des problèmes SAV répétés ou une perte de confiance. La relation commerciale est rompue ou en voie de l'être.",
+    keywords: "arrêt commandes, perte confiance, SAV problème, basculé concurrent, rupture",
+    color: "#DC2626", order: 6, is_neutral: false,
+  },
+  {
+    name: "Non catégorisé",
+    description: "Le comportement du client ne correspond clairement à aucun des 6 profils. Conversation trop courte, hors-sujet, ou ne contient pas assez d'éléments pour identifier une intention commerciale. Ex : demande administrative, question technique sans contexte.",
+    keywords: "neutre, indéterminé, hors sujet, question technique, administratif",
+    color: "#9CA3AF", order: 7, is_neutral: true,
+  },
 ];
 
 function ProfileRow({ profile, onDelete }) {

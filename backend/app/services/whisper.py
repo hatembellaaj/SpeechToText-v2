@@ -31,6 +31,7 @@ def transcribe_file(audio_path: str) -> dict:
     start = time.time()
 
     # ── Étape 1 : Transcription ───────────────────────────────────────────────
+    from app.services.thermor_vocabulary import build_whisper_initial_prompt
     raw_segments, info = model.transcribe(
         audio_path,
         language="fr",
@@ -42,6 +43,7 @@ def transcribe_file(audio_path: str) -> dict:
         log_prob_threshold=-1.0,
         compression_ratio_threshold=2.4,
         condition_on_previous_text=False,
+        initial_prompt=build_whisper_initial_prompt(),
     )
     whisper_segments = list(raw_segments)
 
