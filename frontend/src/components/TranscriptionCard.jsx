@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Copy, Download, Trash2, ChevronDown, ChevronUp, Clock, FileAudio, Users } from "lucide-react";
 import StatusBadge from "./StatusBadge";
+import AnalysisPanel from "./AnalysisPanel";
 import { api } from "../api/client";
 
 function formatDuration(seconds) {
@@ -176,6 +177,9 @@ export default function TranscriptionCard({ transcription, onDelete }) {
           </div>
         </div>
       )}
+
+      {/* Panneau d'analyse PROFILER */}
+      <AnalysisPanel transcriptionId={id} transcriptionStatus={status} />
     </div>
   );
 }

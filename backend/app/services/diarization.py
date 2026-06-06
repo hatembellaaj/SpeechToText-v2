@@ -9,10 +9,16 @@ def get_diarization_pipeline():
     if _pipeline is None:
         from pyannote.audio import Pipeline
         print("[Diarisation] Chargement du pipeline pyannote...")
-        _pipeline = Pipeline.from_pretrained(
+        pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
-            use_auth_token=settings.hf_token or True,
+            use_auth_token=settings.hf_token,
         )
+        if pipeline is None:
+            raise RuntimeError(
+                "Pipeline pyannote non chargé — vérifiez HF_TOKEN et les conditions "
+                "d'utilisation sur https://hf.co/pyannote/speaker-diarization-3.1"
+            )
+        _pipeline = pipeline
         print("[Diarisation] Pipeline chargé.")
     return _pipeline
 

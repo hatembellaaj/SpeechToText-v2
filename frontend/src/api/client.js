@@ -66,3 +66,37 @@ export const api = {
     link.click();
   },
 };
+
+// ── PROFILER API ──────────────────────────────────────────────────────────────
+
+export const projectsApi = {
+  list: () => request("/projects"),
+  get: (id) => request(`/projects/${id}`),
+  create: (data) => request("/projects", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }),
+  delete: (id) => request(`/projects/${id}`, { method: "DELETE" }),
+  stats: (projectId, batchId) => {
+    const params = batchId ? `?batch_id=${batchId}` : "";
+    return request(`/projects/${projectId}/stats${params}`);
+  },
+  createBatch: (projectId, data) => request(`/projects/${projectId}/batches`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  }),
+  listBatches: (projectId) => request(`/projects/${projectId}/batches`),
+};
+
+export const analysisApi = {
+  trigger: (transcriptionId, projectId) => request("/analysis", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transcription_id: transcriptionId, project_id: projectId }),
+  }),
+  getForTranscription: (transcriptionId) =>
+    request(`/analysis/transcription/${transcriptionId}`),
+  get: (id) => request(`/analysis/${id}`),
+};

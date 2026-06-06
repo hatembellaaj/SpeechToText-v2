@@ -5,7 +5,7 @@ from typing import List
 
 class Settings(BaseSettings):
     # App
-    app_name: str = "SpeechToText Thermor"
+    app_name: str = "PROFILER by DORIA"
     environment: str = "development"
     secret_key: str = "changeme"
 
@@ -27,6 +27,9 @@ class Settings(BaseSettings):
 
     # HuggingFace (diarisation)
     hf_token: str = ""
+
+    # Anthropic (analyse LLM)
+    anthropic_api_key: str = ""
 
     # CORS
     allowed_origins: str = "http://localhost,http://localhost:80,http://localhost:3000"
